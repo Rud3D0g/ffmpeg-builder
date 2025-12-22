@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Chris Shirley
 # Based on the build direction at https://trac.ffmpeg.org/wiki/CompilationGuide/Cento
@@ -12,7 +13,13 @@ echo "FFMPEG bin location: $FFMPEG_BIN"
 ansi_none
 
 cd "$FFMPEG_SOURCES" || exit
-tar xjvf nasm-2.15.05.tar.bz2
+git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
+cd nv-codec-headers
+make install
+pkg-config --modversion ffnvcodec
+
+cd "$FFMPEG_SOURCES" || exit
+tar xzvf nasm-2.15.05.tar.gz
 cd nasm-2.15.05 || exit
 ./autogen.sh
 ./configure --prefix="$FFMPEG_BUILD" --bindir="$FFMPEG_BIN"

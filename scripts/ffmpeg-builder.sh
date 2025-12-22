@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Chris Shirley
 # Based on the build direction at https://trac.ffmpeg.org/wiki/CompilationGuide/Cento
@@ -12,13 +13,13 @@ echo "FFMPEG bin location: $FFMPEG_BIN"
 ansi_none
 
 cd "$FFMPEG_SOURCES" || exit
-tar xjvf ffmpeg-snapshot.tar.bz2
-cd ffmpeg || exit
+tar xzvf ffmpeg-$FFMPEG_VERSION.tar.gz
+cd ffmpeg-$FFMPEG_VERSION || exit
 ./configure \
   --prefix="$FFMPEG_BUILD" \
   --pkg-config-flags="--static" \
-  --extra-cflags="-I$FFMPEG_BUILD/include" \
-  --extra-ldflags="-L$FFMPEG_BUILD/lib" \
+  --extra-cflags="-I$FFMPEG_BUILD/include -I/usr/local/cuda/include" \
+  --extra-ldflags="-L$FFMPEG_BUILD/lib -L/usr/local/cuda/lib64" \
   --extra-libs=-lpthread \
   --extra-libs=-lm \
   --bindir="$FFMPEG_BIN" \
@@ -27,7 +28,10 @@ cd ffmpeg || exit
   --enable-libmp3lame \
   --enable-libopus \
   --enable-nonfree \
-  --enable-static
+  --enable-static \
+  --enable-cuda-nvcc \
+  --enable-libnpp \
+  --enable-nvenc
 make
 make install
 
